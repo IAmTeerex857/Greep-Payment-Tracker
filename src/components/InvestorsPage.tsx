@@ -1,48 +1,64 @@
-import React, { useState } from 'react';
-import { useData } from '../hooks/useData';
-import { User } from '../types';
-import { Plus, Edit2, UserX, UserCheck } from 'lucide-react';
+import { Edit2, Plus, UserCheck, UserX } from "lucide-react";
+import React, { useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { useData } from "../hooks/useData";
+import { User } from "../types";
 
 export function InvestorsPage() {
-  const { users, saveUsers } = useData();
+  const { users, addUser, updateUser, toggleUserStatus } = useData();
   const [showModal, setShowModal] = useState(false);
   const [editingInvestor, setEditingInvestor] = useState<User | null>(null);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    tier: 'X' as 'X' | 'Y',
+    name: "",
+    email: "",
+    tier: "X" as "X" | "Y",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const investors = users.filter(u => u.role === 'investor');
+  const investors = users
+    .filter((u) => u.role === "investor")
+    .sort((a, b) => {
+      // Active users first, then inactive users
+      if (a.active && !b.active) return -1;
+      if (!a.active && b.active) return 1;
+      // If both have same status, sort by name
+      return a.name.localeCompare(b.name);
+    });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (editingInvestor) {
-      // Update existing investor
-      const updatedUsers = users.map(u => 
-        u.id === editingInvestor.id 
-          ? { ...u, ...formData }
-          : u
-      );
-      saveUsers(updatedUsers);
-    } else {
-      // Add new investor
-      const newInvestor: User = {
-        id: Date.now().toString(),
-        name: formData.name,
-        email: formData.email,
-        role: 'investor',
-        tier: formData.tier,
-        created_at: new Date().toISOString(),
-        active: true,
-      };
-      saveUsers([...users, newInvestor]);
-    }
+    setIsSubmitting(true);
 
-    setShowModal(false);
-    setEditingInvestor(null);
-    setFormData({ name: '', email: '', tier: 'X' });
+    try {
+      if (editingInvestor) {
+        await updateUser(editingInvestor.id, formData);
+        toast.success("Investor updated successfully!");
+      } else {
+        const newInvestor = {
+          name: formData.name,
+          email: formData.email,
+          role: "investor" as const,
+          password: "no-login-access", // Placeholder password
+          tier: formData.tier,
+          created_at: new Date().toISOString(),
+          active: true,
+          can_login: false,
+        };
+        await addUser(newInvestor);
+        toast.success("Investor added successfully!");
+      }
+
+      setShowModal(false);
+      setEditingInvestor(null);
+      setFormData({ name: "", email: "", tier: "X" });
+    } catch (error) {
+      console.error("Error saving investor:", error);
+      toast.error(
+        editingInvestor ? "Failed to update investor" : "Failed to add investor"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleEdit = (investor: User) => {
@@ -50,22 +66,31 @@ export function InvestorsPage() {
     setFormData({
       name: investor.name,
       email: investor.email,
-      tier: investor.tier as 'X' | 'Y',
+      tier: investor.tier as "X" | "Y",
     });
     setShowModal(true);
   };
 
-  const toggleInvestorStatus = (investorId: string) => {
-    const updatedUsers = users.map(u => 
-      u.id === investorId 
-        ? { ...u, active: !u.active }
-        : u
-    );
-    saveUsers(updatedUsers);
+  const toggleInvestorStatus = async (investorId: string) => {
+    try {
+      const investor = users.find((u) => u.id === investorId);
+      const newStatus = !investor?.active ? "active" : "inactive";
+
+      await toggleUserStatus(investorId);
+      toast.success(
+        `Investor ${
+          newStatus === "active" ? "activated" : "deactivated"
+        } successfully!`
+      );
+    } catch (error) {
+      console.error("Error toggling investor status:", error);
+      toast.error("Failed to update investor status");
+    }
   };
 
   return (
     <div className="p-6">
+      <Toaster position="top-right" />
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Investors</h1>
@@ -109,28 +134,40 @@ export function InvestorsPage() {
               {investors.map((investor) => (
                 <tr key={investor.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{investor.name}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {investor.name}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{investor.email}</div>
+                    <div className="text-sm text-gray-900">
+                      {investor.email}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      investor.tier === 'X' ? 'bg-purple-100 text-purple-800' : 'bg-orange-100 text-orange-800'
-                    }`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        investor.tier === "X"
+                          ? "bg-purple-100 text-purple-800"
+                          : "bg-orange-100 text-orange-800"
+                      }`}
+                    >
                       Tier {investor.tier}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      ₺{investor.tier === 'X' ? '15,000' : '16,500'}
+                      ₺{investor.tier === "X" ? "15,000" : "16,500"}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      investor.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {investor.active ? 'Active' : 'Inactive'}
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        investor.active
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {investor.active ? "Active" : "Inactive"}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -144,10 +181,16 @@ export function InvestorsPage() {
                       <button
                         onClick={() => toggleInvestorStatus(investor.id)}
                         className={`${
-                          investor.active ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'
+                          investor.active
+                            ? "text-red-600 hover:text-red-900"
+                            : "text-green-600 hover:text-green-900"
                         }`}
                       >
-                        {investor.active ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
+                        {investor.active ? (
+                          <UserX className="w-4 h-4" />
+                        ) : (
+                          <UserCheck className="w-4 h-4" />
+                        )}
                       </button>
                     </div>
                   </td>
@@ -163,7 +206,7 @@ export function InvestorsPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h2 className="text-xl font-bold text-gray-900 mb-4">
-              {editingInvestor ? 'Edit Investor' : 'Add New Investor'}
+              {editingInvestor ? "Edit Investor" : "Add New Investor"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -174,7 +217,9 @@ export function InvestorsPage() {
                   type="text"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -186,7 +231,9 @@ export function InvestorsPage() {
                   type="email"
                   required
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -196,7 +243,12 @@ export function InvestorsPage() {
                 </label>
                 <select
                   value={formData.tier}
-                  onChange={(e) => setFormData({...formData, tier: e.target.value as 'X' | 'Y'})}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      tier: e.target.value as "X" | "Y",
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="X">Tier X (₺15,000/month)</option>
@@ -209,7 +261,7 @@ export function InvestorsPage() {
                   onClick={() => {
                     setShowModal(false);
                     setEditingInvestor(null);
-                    setFormData({ name: '', email: '', tier: 'X' });
+                    setFormData({ name: "", email: "", tier: "X" });
                   }}
                   className="px-4 py-2 text-gray-600 hover:text-gray-800"
                 >
@@ -217,9 +269,15 @@ export function InvestorsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {editingInvestor ? 'Update' : 'Add'} Investor
+                  {isSubmitting
+                    ? "Saving..."
+                    : editingInvestor
+                    ? "Update"
+                    : "Add"}{" "}
+                  Investor
                 </button>
               </div>
             </form>

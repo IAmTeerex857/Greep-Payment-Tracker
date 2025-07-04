@@ -2,15 +2,15 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'driver' | 'investor';
-  tier: 'A' | 'B' | 'X' | 'Y';
+  role: "admin" | "driver" | "investor";
+  tier: "A" | "B" | "X" | "Y";
   created_at: string;
   active: boolean;
   can_login: boolean;
 }
 
 export interface DriverPayment {
-  id: string;
+  id?: string;
   driver_id: string;
   week_start_date: string;
   amount_paid: number;
@@ -21,11 +21,11 @@ export interface DriverPayment {
 }
 
 export interface Expense {
-  id: string;
+  id?: string;
   amount: number;
   date: string;
   description: string;
-  type: 'admin' | 'driver' | 'investor';
+  type: "admin" | "driver" | "investor";
   paid_by: string;
   user_id?: string; // For driver/investor expenses
   notes?: string;
@@ -34,13 +34,13 @@ export interface Expense {
 }
 
 export interface InvestorPayout {
-  id: string;
+  id?: string;
   investor_id: string;
   month: string;
   gross_amount: number;
-  deductions: number;
   net_amount: number;
-  status: 'pending' | 'paid';
+  total_expenses: number;
+  status: "pending" | "paid";
   notes?: string;
   created_at: string;
   created_by: string;
