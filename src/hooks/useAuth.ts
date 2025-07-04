@@ -60,45 +60,68 @@ export function useAuth() {
       return false;
     }
     
-    // For production, we need to verify the password
-    if (password !== 'Grace2Grace') {
-      console.log('Login failed - invalid password'); // Debug log
-      return false;
-    }
-    
     try {
-      // Create a hardcoded admin user
-      const user: User = {
-        id: '957dadef-fa6e-42eb-bf2b-731f6d726391', // Admin user ID
-        name: 'Admin User',
-        email: 'admin@greep.io',
-        role: 'admin',
-        tier: 'A',
-        created_at: new Date().toISOString(),
-        active: true,
-        can_login: true
-      };
-      
-      // Update auth state immediately
-      setAuthState({
-        user,
-        isAuthenticated: true,
-      });
-      
-      // Try to sign in with Supabase Auth in the background
-      // This won't block the user experience and won't cause login to fail if it errors
-      supabase.auth.signInWithPassword({
+      // Authenticate with Supabase Auth
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
-      }).then(({ error }) => {
-        if (error) {
-          console.warn('Supabase auth warning (continuing anyway):', error.message);
-          // Even if auth fails, we'll still be logged in
-        } else {
-          console.log('Supabase auth session created successfully');
-        }
-      }).catch(err => {
-        console.warn('Supabase auth error (continuing anyway):', err);
+      });
+      
+      if (error) {
+        console.error('Authentication failed:', error.message);
+        return false;
+      }
+      
+      if (!data.user) {
+        console.error('No user returned from authentication');
+        return false;
+      }
+      
+      console.log('Supabase auth successful, fetching user data');
+      
+      // Fetch user data from our custom users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
+      
+      if (userError) {
+        console.error('Error fetching user data:', userError.message);
+        // If we can't fetch user data, use a default admin user
+        const defaultUser: User = {
+          id: data.user.id,
+          name: 'Admin User',
+          email: 'admin@greep.io',
+          role: 'admin',
+          tier: 'A',
+          created_at: new Date().toISOString(),
+          active: true,
+          can_login: true
+        };
+        
+        setAuthState({
+          user: defaultUser,
+          isAuthenticated: true,
+        });
+        
+        return true;
+      }
+      
+      if (!userData) {
+        console.error('No user found in database');
+        return false;
+      }
+      
+      if (!userData.can_login) {
+        console.error('User is not allowed to login');
+        return false;
+      }
+      
+      // Update auth state with the user data
+      setAuthState({
+        user: userData as User,
+        isAuthenticated: true,
       });
       
       return true;
@@ -113,27 +136,25 @@ export function useAuth() {
   };
 
   const logout = async () => {
-    console.log('Logging out'); // Debug log
-    
     try {
-      // Clear Supabase session
-      await supabase.auth.signOut();
+      // Sign out from Supabase Auth
+      const { error } = await supabase.auth.signOut();
       
-      // Clear local auth state
+      if (error) {
+        console.error('Error signing out:', error.message);
+      }
+      
+      // Clear auth state
       setAuthState({
         user: null,
         isAuthenticated: false,
       });
       
-      // Clear any local storage items
-      localStorage.removeItem('supabase.auth.token');
+      console.log('Successfully logged out');
+    } catch (err) {
+      console.error('Logout error:', err);
       
-      // Force reload the page to ensure all state is cleared
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Error during logout:', error);
-      
-      // Force state reset even if there was an error
+      // Still clear local state even if Supabase logout fails
       setAuthState({
         user: null,
         isAuthenticated: false,
