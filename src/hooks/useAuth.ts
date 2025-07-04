@@ -28,7 +28,7 @@ export function useAuth() {
             const defaultUser: User = {
               id: session.user.id,
               name: "Admin User",
-              email: "aspertheman299@gmail.com",
+              email: "caspertheman299@gmail.com",
               role: "admin",
               tier: "A",
               created_at: new Date().toISOString(),
@@ -71,25 +71,11 @@ export function useAuth() {
 
     // Only allow admin@greep.io to login
     if (email !== "caspertheman299@gmail.com") {
-      console.log("Login failed - only admin@greep.io can login"); // Debug log
+      console.log("Login failed - only caspertheman299@gmail.com can login"); // Debug log
       return false;
     }
 
     try {
-      // const { data: data1, error: error1 } = await supabase.auth.signUp({
-      //   email: "caspertheman299@gmail.com",
-      //   password: "Grace2Grace",
-      // });
-
-      // if (error1) {
-      //   console.error("Error signing up:", error1.message);
-      //   return false;
-      // }
-      // console.log(data1); // Debug log
-      // Authenticate with Supabase Auth
-      const encryptedEmail = "bS5tYXJhanVsQGdtYWlsLmNvbQ==";
-      const decryptedEmail = atob(encryptedEmail);
-      email = decryptedEmail; // Temporary hardcoded email for testing
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -120,7 +106,7 @@ export function useAuth() {
         const defaultUser: User = {
           id: data.user.id,
           name: "Admin User",
-          email: "admin@greep.io",
+          email: "caspertheman299@gmail.com",
           role: "admin",
           tier: "A",
           created_at: new Date().toISOString(),
@@ -152,10 +138,6 @@ export function useAuth() {
         isAuthenticated: true,
       });
 
-      return true;
-
-      // Return success immediately
-      console.log("Login successful"); // Debug log
       return true;
     } catch (error) {
       console.error("Login error:", error);
