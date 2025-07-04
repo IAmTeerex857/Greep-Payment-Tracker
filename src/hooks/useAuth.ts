@@ -70,7 +70,7 @@ export function useAuth() {
     console.log("Login attempt:", { email }); // Debug log
 
     // Only allow admin@greep.io to login
-    if (email !== "aspertheman299@gmail.com") {
+    if (email !== "caspertheman299@gmail.com") {
       console.log("Login failed - only admin@greep.io can login"); // Debug log
       return false;
     }

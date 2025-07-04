@@ -16,8 +16,8 @@ export function Login() {
 
     try {
       // Only allow admin@greep.io to login
-      if (email !== "aspertheman299@gmail.com") {
-        setError("Only aspertheman299@gmail.com is allowed to login.");
+      if (email !== "caspertheman299@gmail.com") {
+        setError("Only caspertheman299@gmail.com is allowed to login.");
         setIsLoading(false);
         return;
       }
