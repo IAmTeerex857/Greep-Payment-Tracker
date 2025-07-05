@@ -18,43 +18,20 @@ export function useAuth() {
       if (session) {
         try {
           // Get user data from the users table
-          const { data: userData, error } = await supabase
-            .from("users")
-            .select("*")
-            .eq("email", session.user.email)
-            .single();
 
-          if (error || !userData) {
-            const defaultUser: User = {
-              id: session.user.id,
-              name: "Admin User",
-              email: "caspertheman299@gmail.com",
-              role: "admin",
-              tier: "A",
-              created_at: new Date().toISOString(),
-              active: true,
-              can_login: true,
-            };
-
-            setAuthState({
-              user: defaultUser,
-              isAuthenticated: true,
-            });
-          }
-
-          const user: User = {
-            id: userData.id,
-            name: userData.name,
-            email: userData.email,
-            role: userData.role,
-            tier: userData.tier,
-            created_at: userData.created_at,
-            active: userData.active,
-            can_login: userData.can_login,
+          const defaultUser: User = {
+            id: session.user.id,
+            name: "Admin User",
+            email: "caspertheman299@gmail.com",
+            role: "admin",
+            tier: "A",
+            created_at: new Date().toISOString(),
+            active: true,
+            can_login: true,
           };
 
           setAuthState({
-            user,
+            user: defaultUser,
             isAuthenticated: true,
           });
         } catch (error) {

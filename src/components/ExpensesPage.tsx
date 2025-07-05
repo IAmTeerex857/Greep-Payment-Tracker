@@ -1,10 +1,10 @@
 import {
   Calendar,
-  Delete,
   DollarSign,
   Edit2,
   Plus,
   Receipt,
+  Trash,
 } from "lucide-react";
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
@@ -120,7 +120,7 @@ export function ExpensesPage() {
             resetForm();
             setShowModal(true);
           }}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           Add Expense
@@ -214,17 +214,17 @@ export function ExpensesPage() {
                         <div className="flex items-center gap-3">
                           <button
                             onClick={() => handleEdit(expense)}
-                            className="text-blue-600 hover:text-blue-900"
+                            className="text-green-600 hover:text-green-900"
                             title="Edit expense"
                           >
-                            <Edit2 />
+                            <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(expense)}
                             className="text-red-600 hover:text-red-900"
                             title="Delete expense"
                           >
-                            <Delete />
+                            <Trash className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -366,7 +366,7 @@ export function ExpensesPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
                 >
                   {editingExpense ? "Update Expense" : "Add Expense"}
                 </button>
