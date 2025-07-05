@@ -1,4 +1,4 @@
-import { AlertCircle, Car } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 
@@ -40,11 +40,10 @@ export function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8">
+        {" "}
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Car className="w-8 h-8 text-white" />
-            </div>
+            <img src="/logo.svg" alt="Greep Logo" className=" text-white" />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Greep Payment Tracker
@@ -53,7 +52,6 @@ export function Login() {
             Admin access only - Sign in to manage payments
           </p>
         </div>
-
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="bg-white p-8 rounded-xl shadow-lg space-y-6">
             {error && (
