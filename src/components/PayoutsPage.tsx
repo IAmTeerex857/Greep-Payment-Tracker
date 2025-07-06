@@ -1,12 +1,4 @@
-import {
-  Calendar,
-  CheckCircle,
-  Clock,
-  DollarSign,
-  Edit2,
-  Plus,
-  Trash,
-} from "lucide-react";
+import { Calendar, CheckCircle, Clock, Edit2, Plus, Trash } from "lucide-react";
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useData } from "../hooks/useData";
@@ -189,7 +181,6 @@ export function PayoutsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <DollarSign className="w-4 h-4 text-blue-500 mr-1" />
                           <span className="text-sm text-gray-900">
                             ₺{payout.gross_amount.toLocaleString()}
                           </span>
@@ -197,7 +188,6 @@ export function PayoutsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <DollarSign className="w-4 h-4 text-red-500 mr-1" />
                           <span className="text-sm text-red-600">
                             ₺{payout.total_expenses.toLocaleString()}
                           </span>
@@ -205,7 +195,6 @@ export function PayoutsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <DollarSign className="w-4 h-4 text-green-500 mr-1" />
                           <span className="text-sm font-medium text-green-600">
                             ₺{payout.net_amount.toLocaleString()}
                           </span>

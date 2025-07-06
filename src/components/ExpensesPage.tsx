@@ -1,11 +1,4 @@
-import {
-  Calendar,
-  DollarSign,
-  Edit2,
-  Plus,
-  Receipt,
-  Trash,
-} from "lucide-react";
+import { Calendar, Edit2, Plus, Receipt, Trash } from "lucide-react";
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useData } from "../hooks/useData";
@@ -186,7 +179,6 @@ export function ExpensesPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <DollarSign className="w-4 h-4 text-red-500 mr-1" />
                           <span className="text-sm font-medium text-red-600">
                             ₺{expense.amount.toLocaleString()}
                           </span>
