@@ -7,16 +7,17 @@ export function useAuth() {
     user: null,
     isAuthenticated: false,
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is already authenticated with Supabase
     const checkSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-      if (session) {
-        try {
+        if (session) {
           // Get user data from the users table
 
           const defaultUser: User = {
@@ -34,13 +35,46 @@ export function useAuth() {
             user: defaultUser,
             isAuthenticated: true,
           });
-        } catch (error) {
-          console.error("Error checking session:", error);
         }
+      } catch (error) {
+        console.error("Error checking session:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     checkSession();
+
+    // Listen for auth state changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_IN" && session) {
+        const defaultUser: User = {
+          id: session.user.id,
+          name: "Admin User",
+          email: "caspertheman299@gmail.com",
+          role: "admin",
+          tier: "A",
+          created_at: new Date().toISOString(),
+          active: true,
+          can_login: true,
+        };
+
+        setAuthState({
+          user: defaultUser,
+          isAuthenticated: true,
+        });
+      } else if (event === "SIGNED_OUT") {
+        setAuthState({
+          user: null,
+          isAuthenticated: false,
+        });
+      }
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -138,8 +172,6 @@ export function useAuth() {
       });
 
       console.log("Successfully logged out");
-      // Redirect to home page
-      window.location.reload();
     } catch (err) {
       console.error("Logout error:", err);
 
@@ -148,7 +180,6 @@ export function useAuth() {
         user: null,
         isAuthenticated: false,
       });
-      window.location.href = "/";
     }
   };
 
@@ -156,5 +187,6 @@ export function useAuth() {
     ...authState,
     login,
     logout,
+    isLoading,
   };
 }

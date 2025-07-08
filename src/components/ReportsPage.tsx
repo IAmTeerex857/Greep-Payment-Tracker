@@ -1,6 +1,6 @@
 import { FileSpreadsheet, FileText, Loader, TrendingUp } from "lucide-react";
 import { useState } from "react";
-import { useData } from "../hooks/useData";
+import { useData } from "../hooks/useGlobalData";
 import {
   exportToCSV,
   exportToPDF,

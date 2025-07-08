@@ -1,5 +1,6 @@
 import { AlertCircle, Moon, Sun } from "lucide-react";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useDarkMode } from "../hooks/useDarkMode";
 
@@ -10,6 +11,7 @@ export function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +31,8 @@ export function Login() {
       if (!success) {
         setError("Invalid credentials. Please check your email and password.");
       } else {
-        window.location.reload();
+        // Redirect to dashboard after successful login
+        navigate("/dashboard");
       }
     } catch (err) {
       console.error("Login error:", err);

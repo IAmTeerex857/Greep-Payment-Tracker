@@ -1,5 +1,5 @@
 import { Car, TrendingUp, Users } from "lucide-react";
-import { useData } from "../hooks/useData";
+import { useData } from "../hooks/useGlobalData";
 
 export function Dashboard() {
   const { getDashboardStats, users, payments, payouts } = useData();

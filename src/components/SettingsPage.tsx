@@ -6,7 +6,7 @@ import {
   Upload,
 } from "lucide-react";
 import React, { useState } from "react";
-import { useData } from "../hooks/useData";
+import { useData } from "../hooks/useGlobalData";
 import { importFromCSV } from "../utils/importUtils";
 
 export function SettingsPage() {

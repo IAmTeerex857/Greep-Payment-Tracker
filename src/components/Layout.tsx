@@ -14,18 +14,19 @@ import {
   X,
 } from "lucide-react";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useDarkMode } from "../hooks/useDarkMode";
 
 interface LayoutProps {
   children: React.ReactNode;
   currentPage: string;
-  onPageChange: (page: string) => void;
 }
 
-export function Layout({ children, currentPage, onPageChange }: LayoutProps) {
+export function Layout({ children, currentPage }: LayoutProps) {
   const { logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigationItems = [
@@ -40,7 +41,7 @@ export function Layout({ children, currentPage, onPageChange }: LayoutProps) {
   ];
 
   const handlePageChange = (page: string) => {
-    onPageChange(page);
+    navigate(`/${page}`);
     setIsSidebarOpen(false); // Close sidebar on mobile when navigating
   };
 
@@ -149,7 +150,10 @@ export function Layout({ children, currentPage, onPageChange }: LayoutProps) {
 
         <div className="p-4 border-t border-gray-200 dark:border-gray-700">
           <button
-            onClick={logout}
+            onClick={async () => {
+              await logout();
+              navigate("/login");
+            }}
             className="w-full flex items-center px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
           >
             <LogOut className="w-4 h-4 mr-2" />
