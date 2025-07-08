@@ -148,6 +148,7 @@ export function DataTable<TData, TValue>({
       </div>
 
       {/* Pagination */}
+      {/* Pagination */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Results info */}
         <div className="text-sm text-gray-700 dark:text-gray-300 order-2 sm:order-1">
