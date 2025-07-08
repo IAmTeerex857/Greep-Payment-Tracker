@@ -1,11 +1,26 @@
+import { ColumnDef } from "@tanstack/react-table";
 import { Edit2, Plus, UserCheck, UserX } from "lucide-react";
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { useData } from "../hooks/useData";
+import { useDriversPaginated } from "../hooks/useDriversPaginated";
 import { User } from "../types";
+import { DataTable } from "./DataTable";
 
 export function DriversPage() {
-  const { users, addUser, updateUser, toggleUserStatus } = useData();
+  const {
+    data: drivers,
+    totalCount,
+    pageCount,
+    isLoading,
+    pagination,
+    setPagination,
+    sorting,
+    setSorting,
+    addDriver,
+    updateDriver,
+    toggleDriverStatus,
+  } = useDriversPaginated();
+
   const [showModal, setShowModal] = useState(false);
   const [editingDriver, setEditingDriver] = useState<User | null>(null);
   const [formData, setFormData] = useState({
@@ -15,15 +30,128 @@ export function DriversPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const drivers = users
-    .filter((u) => u.role === "driver")
-    .sort((a, b) => {
-      // Active users first, then inactive users
-      if (a.active && !b.active) return -1;
-      if (!a.active && b.active) return 1;
-      // If both have same status, sort by name
-      return a.name.localeCompare(b.name);
+  const handleEdit = useCallback((driver: User) => {
+    setEditingDriver(driver);
+    setFormData({
+      name: driver.name,
+      email: driver.email,
+      tier: driver.tier as "A" | "B",
     });
+    setShowModal(true);
+  }, []);
+
+  const handleToggleStatus = useCallback(
+    async (driverId: string) => {
+      try {
+        const driver = drivers.find((d) => d.id === driverId);
+        const newStatus = !driver?.active ? "active" : "inactive";
+
+        await toggleDriverStatus(driverId);
+        toast.success(
+          `Driver ${
+            newStatus === "active" ? "activated" : "deactivated"
+          } successfully!`
+        );
+      } catch (error) {
+        console.error("Error toggling driver status:", error);
+        toast.error("Failed to update driver status");
+      }
+    },
+    [drivers, toggleDriverStatus]
+  );
+
+  const columns: ColumnDef<User>[] = useMemo(
+    () => [
+      {
+        accessorKey: "name",
+        header: "Name",
+        cell: ({ row }) => (
+          <div className="text-sm font-medium text-gray-900 dark:text-white">
+            {row.getValue("name")}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "email",
+        header: "Email",
+        cell: ({ row }) => (
+          <div className="text-sm text-gray-600 dark:text-gray-300">
+            {row.getValue("email")}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "tier",
+        header: "Tier",
+        cell: ({ row }) => {
+          const tier = row.getValue("tier") as string;
+          return (
+            <span
+              className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                tier === "A"
+                  ? "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400"
+                  : "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400"
+              }`}
+            >
+              Tier {tier}
+            </span>
+          );
+        },
+      },
+      {
+        accessorKey: "active",
+        header: "Status",
+        cell: ({ row }) => {
+          const isActive = row.getValue("active") as boolean;
+          return (
+            <span
+              className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                isActive
+                  ? "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400"
+                  : "bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400"
+              }`}
+            >
+              {isActive ? "Active" : "Inactive"}
+            </span>
+          );
+        },
+      },
+      {
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }) => {
+          const driver = row.original;
+          return (
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => handleEdit(driver)}
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"
+                title="Edit driver"
+              >
+                <Edit2 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => handleToggleStatus(driver.id)}
+                className={`transition-colors ${
+                  driver.active
+                    ? "text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                    : "text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
+                }`}
+                title={driver.active ? "Deactivate driver" : "Activate driver"}
+              >
+                {driver.active ? (
+                  <UserX className="w-4 h-4" />
+                ) : (
+                  <UserCheck className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+          );
+        },
+      },
+    ],
+    [handleEdit, handleToggleStatus]
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,20 +159,20 @@ export function DriversPage() {
 
     try {
       if (editingDriver) {
-        await updateUser(editingDriver.id, formData);
+        await updateDriver(editingDriver.id, formData);
         toast.success("Driver updated successfully!");
       } else {
         const newDriver = {
           name: formData.name,
           email: formData.email,
-          role: "driver" as const,
-          password: "no-login-access",
           tier: formData.tier,
-          created_at: new Date().toISOString(),
+          password: "no-login-access",
+          role: "driver" as const,
           active: true,
           can_login: false,
+          created_at: new Date().toISOString(),
         };
-        await addUser(newDriver);
+        await addDriver(newDriver);
         toast.success("Driver added successfully!");
       }
 
@@ -61,40 +189,17 @@ export function DriversPage() {
     }
   };
 
-  const handleEdit = (driver: User) => {
-    setEditingDriver(driver);
-    setFormData({
-      name: driver.name,
-      email: driver.email,
-      tier: driver.tier as "A" | "B",
-    });
-    setShowModal(true);
-  };
-
-  const toggleDriverStatus = async (driverId: string) => {
-    try {
-      const driver = users.find((u) => u.id === driverId);
-      const newStatus = !driver?.active ? "active" : "inactive";
-
-      await toggleUserStatus(driverId);
-      toast.success(
-        `Driver ${
-          newStatus === "active" ? "activated" : "deactivated"
-        } successfully!`
-      );
-    } catch (error) {
-      console.error("Error toggling driver status:", error);
-      toast.error("Failed to update driver status");
-    }
-  };
-
   return (
     <div className="p-8">
       <Toaster position="top-right" />
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Drivers</h1>
-          <p className="text-gray-600">Manage your driver roster</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Drivers
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Manage your driver roster
+          </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -105,111 +210,28 @@ export function DriversPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Email
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Tier
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {drivers.map((driver) => (
-                <tr
-                  key={driver.id}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {driver.name}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-600">{driver.email}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
-                        driver.tier === "A"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-blue-100 text-blue-800"
-                      }`}
-                    >
-                      Tier {driver.tier}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
-                        driver.active
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {driver.active ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => handleEdit(driver)}
-                        className="text-blue-600 hover:text-blue-900 transition-colors"
-                        title="Edit driver"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => toggleDriverStatus(driver.id)}
-                        className={`transition-colors ${
-                          driver.active
-                            ? "text-red-600 hover:text-red-900"
-                            : "text-green-600 hover:text-green-900"
-                        }`}
-                        title={
-                          driver.active
-                            ? "Deactivate driver"
-                            : "Activate driver"
-                        }
-                      >
-                        {driver.active ? (
-                          <UserX className="w-4 h-4" />
-                        ) : (
-                          <UserCheck className="w-4 h-4" />
-                        )}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <DataTable
+        columns={columns}
+        data={drivers}
+        pagination={pagination}
+        onPaginationChange={setPagination}
+        sorting={sorting}
+        onSortingChange={setSorting}
+        pageCount={pageCount}
+        totalCount={totalCount}
+        isLoading={isLoading}
+      />
 
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
               {editingDriver ? "Edit Driver" : "Add New Driver"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Name
                 </label>
                 <input
@@ -219,11 +241,11 @@ export function DriversPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Email
                 </label>
                 <input
@@ -233,11 +255,11 @@ export function DriversPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Tier
                 </label>
                 <select
@@ -248,7 +270,7 @@ export function DriversPage() {
                       tier: e.target.value as "A" | "B",
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="A">Tier A</option>
                   <option value="B">Tier B</option>
@@ -262,7 +284,7 @@ export function DriversPage() {
                     setEditingDriver(null);
                     setFormData({ name: "", email: "", tier: "A" });
                   }}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+                  className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white font-medium transition-colors"
                 >
                   Cancel
                 </button>

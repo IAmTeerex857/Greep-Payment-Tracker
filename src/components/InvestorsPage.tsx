@@ -93,8 +93,12 @@ export function InvestorsPage() {
       <Toaster position="top-right" />
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Investors</h1>
-          <p className="text-gray-600">Manage your investor roster</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Investors
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Manage your investor roster
+          </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -105,41 +109,44 @@ export function InvestorsPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Email
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Tier
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Monthly Rate
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {investors.map((investor) => (
-                <tr key={investor.id}>
+                <tr
+                  key={investor.id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">
                       {investor.name}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
+                    <div className="text-sm text-gray-900 dark:text-gray-300">
                       {investor.email}
                     </div>
                   </td>
@@ -147,15 +154,15 @@ export function InvestorsPage() {
                     <span
                       className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                         investor.tier === "X"
-                          ? "bg-purple-100 text-purple-800"
-                          : "bg-orange-100 text-orange-800"
+                          ? "bg-purple-100 dark:bg-purple-900/20 text-purple-800 dark:text-purple-400"
+                          : "bg-orange-100 dark:bg-orange-900/20 text-orange-800 dark:text-orange-400"
                       }`}
                     >
                       Tier {investor.tier}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
+                    <div className="text-sm text-gray-900 dark:text-gray-300">
                       ₺{investor.tier === "X" ? "15,000" : "16,500"}
                     </div>
                   </td>
@@ -163,8 +170,8 @@ export function InvestorsPage() {
                     <span
                       className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                         investor.active
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
+                          ? "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400"
+                          : "bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400"
                       }`}
                     >
                       {investor.active ? "Active" : "Inactive"}
@@ -174,7 +181,7 @@ export function InvestorsPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleEdit(investor)}
-                        className="text-blue-600 hover:text-blue-900"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
@@ -182,8 +189,8 @@ export function InvestorsPage() {
                         onClick={() => toggleInvestorStatus(investor.id)}
                         className={`${
                           investor.active
-                            ? "text-red-600 hover:text-red-900"
-                            : "text-green-600 hover:text-green-900"
+                            ? "text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                            : "text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
                         }`}
                       >
                         {investor.active ? (
@@ -204,13 +211,13 @@ export function InvestorsPage() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
               {editingInvestor ? "Edit Investor" : "Add New Investor"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Name
                 </label>
                 <input
@@ -220,11 +227,11 @@ export function InvestorsPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Email
                 </label>
                 <input
@@ -234,11 +241,11 @@ export function InvestorsPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Tier
                 </label>
                 <select
@@ -249,7 +256,7 @@ export function InvestorsPage() {
                       tier: e.target.value as "X" | "Y",
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="X">Tier X (₺15,000/month)</option>
                   <option value="Y">Tier Y (₺16,500/month)</option>
@@ -263,7 +270,7 @@ export function InvestorsPage() {
                     setEditingInvestor(null);
                     setFormData({ name: "", email: "", tier: "X" });
                   }}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                  className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
                 >
                   Cancel
                 </button>

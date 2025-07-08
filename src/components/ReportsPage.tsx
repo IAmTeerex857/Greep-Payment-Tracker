@@ -112,8 +112,12 @@ export function ReportsPage() {
     <div className="p-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Reports</h1>
-          <p className="text-gray-600">Financial analytics and insights</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Reports
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Financial analytics and insights
+          </p>
         </div>
         <div className="flex gap-2">
           <button
@@ -149,14 +153,14 @@ export function ReportsPage() {
 
       {/* Month Selector */}
       <div className="mb-8">
-        <label className="block text-sm font-medium text-gray-700 mb-3">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           Select Month for Analysis
         </label>
         <input
           type="month"
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(e.target.value)}
-          className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+          className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
         />
       </div>
 
@@ -165,16 +169,18 @@ export function ReportsPage() {
         <div className="flex justify-center items-center py-20">
           <div className="flex flex-col items-center">
             <Loader className="w-12 h-12 text-blue-600 animate-spin mb-4" />
-            <p className="text-gray-600 font-medium">Loading data...</p>
+            <p className="text-gray-600 dark:text-gray-300 font-medium">
+              Loading data...
+            </p>
           </div>
         </div>
       )}
 
       {/* Monthly Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
           <div className="flex items-center">
-            <div className="p-3 bg-green-100 rounded-lg">
+            <div className="p-3 bg-green-100 dark:bg-green-900 rounded-lg">
               <img
                 src="/lira.svg"
                 alt="Turkish Lira"
@@ -186,19 +192,19 @@ export function ReportsPage() {
               />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 mb-1">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                 Monthly Revenue
               </p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 ₺{monthlyRevenue.toLocaleString()}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
           <div className="flex items-center">
-            <div className="p-3 bg-red-100 rounded-lg">
+            <div className="p-3 bg-red-100 dark:bg-red-900 rounded-lg">
               <img
                 src="/lira.svg"
                 alt="Turkish Lira"
@@ -210,19 +216,19 @@ export function ReportsPage() {
               />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 mb-1">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                 Monthly Expenses
               </p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 ₺{monthlyExpenseTotal.toLocaleString()}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
           <div className="flex items-center">
-            <div className="p-3 bg-orange-100 rounded-lg">
+            <div className="p-3 bg-orange-100 dark:bg-orange-900 rounded-lg">
               <img
                 src="/lira.svg"
                 alt="Turkish Lira"
@@ -234,23 +240,23 @@ export function ReportsPage() {
               />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 mb-1">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                 Monthly Payouts
               </p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 ₺{monthlyPayoutTotal.toLocaleString()}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
           <div className="flex items-center">
-            <div className="p-3 bg-blue-100 rounded-lg">
+            <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg">
               <TrendingUp className="w-6 h-6 text-blue-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 mb-1">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                 Monthly Profit
               </p>
               <p
@@ -268,8 +274,8 @@ export function ReportsPage() {
       {/* Detailed Reports */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
         {/* Driver Performance */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
             Driver Performance
           </h3>
           <div className="space-y-4">
@@ -286,11 +292,13 @@ export function ReportsPage() {
                 return (
                   <div
                     key={driver.id}
-                    className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0"
+                    className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
                   >
                     <div>
-                      <p className="font-medium text-gray-900">{driver.name}</p>
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {driver.name}
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                         Tier {driver.tier}
                       </p>
                     </div>
@@ -298,7 +306,7 @@ export function ReportsPage() {
                       <p className="text-lg font-semibold text-green-600">
                         ₺{totalEarned.toLocaleString()}
                       </p>
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                         {driverPayments.length} payment
                         {driverPayments.length !== 1 ? "s" : ""}
                       </p>
@@ -309,15 +317,17 @@ export function ReportsPage() {
             {users.filter((u) => u.role === "driver" && u.active).length ===
               0 && (
               <div className="text-center py-8">
-                <p className="text-gray-500">No active drivers found</p>
+                <p className="text-gray-500 dark:text-gray-400">
+                  No active drivers found
+                </p>
               </div>
             )}
           </div>
         </div>
 
         {/* Expense Breakdown */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
             Expense Breakdown
           </h3>
           <div className="space-y-4">
@@ -332,13 +342,13 @@ export function ReportsPage() {
               return (
                 <div
                   key={type}
-                  className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0"
+                  className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
                 >
                   <div>
-                    <p className="font-medium text-gray-900 capitalize">
+                    <p className="font-medium text-gray-900 dark:text-white capitalize">
                       {type} Expenses
                     </p>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {typeExpenses.length} item
                       {typeExpenses.length !== 1 ? "s" : ""}
                     </p>
@@ -347,7 +357,7 @@ export function ReportsPage() {
                     <p className="text-lg font-semibold text-red-600">
                       ₺{totalAmount.toLocaleString()}
                     </p>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {totalAmount > 0 && monthlyExpenseTotal > 0
                         ? `${(
                             (totalAmount / monthlyExpenseTotal) *
@@ -364,8 +374,8 @@ export function ReportsPage() {
       </div>
 
       {/* All-Time Stats */}
-      <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">
+      <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
           All-Time Summary
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -373,19 +383,25 @@ export function ReportsPage() {
             <p className="text-3xl font-bold text-green-600 mb-2">
               ₺{stats.totalRevenue.toLocaleString()}
             </p>
-            <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              Total Revenue
+            </p>
           </div>
           <div className="text-center">
             <p className="text-3xl font-bold text-red-600 mb-2">
               ₺{stats.totalExpenses.toLocaleString()}
             </p>
-            <p className="text-sm font-medium text-gray-600">Total Expenses</p>
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              Total Expenses
+            </p>
           </div>
           <div className="text-center">
             <p className="text-3xl font-bold text-orange-600 mb-2">
               ₺{stats.totalPayouts.toLocaleString()}
             </p>
-            <p className="text-sm font-medium text-gray-600">Total Payouts</p>
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              Total Payouts
+            </p>
           </div>
           <div className="text-center">
             <p
@@ -395,7 +411,9 @@ export function ReportsPage() {
             >
               ₺{stats.netProfit.toLocaleString()}
             </p>
-            <p className="text-sm font-medium text-gray-600">Net Profit</p>
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              Net Profit
+            </p>
           </div>
         </div>
       </div>
