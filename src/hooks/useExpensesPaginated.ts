@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { Expense } from "../types";
 import { useData } from "./useGlobalData";
@@ -20,12 +20,11 @@ export interface ExpensesResponse {
 }
 
 export function useExpensesPaginated() {
-  // Removed unused destructured elements from useData()
-  useData();
-  const [data, setData] = useState<Expense[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [pageCount, setPageCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const {
+    expenses: allData,
+    refreshExpenses,
+    isLoading: globalLoading,
+  } = useData();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -34,50 +33,41 @@ export function useExpensesPaginated() {
     { id: "date", desc: true }, // Most recent expenses first
   ]);
 
-  const fetchExpenses = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      let query = supabase.from("expenses").select("*", { count: "exact" });
+  // Filter and sort data in frontend
+  const filteredAndSortedData = useMemo(() => {
+    let filtered = [...allData];
 
-      // Apply sorting
-      if (sorting.length > 0) {
-        const primarySort = sorting[0];
-        query = query.order(primarySort.id, { ascending: !primarySort.desc });
+    // Apply sorting
+    if (sorting.length > 0) {
+      filtered = filtered.sort((a, b) => {
+        for (const sort of sorting) {
+          const aValue = a[sort.id as keyof Expense];
+          const bValue = b[sort.id as keyof Expense];
 
-        // Apply secondary sort if available
-        if (sorting.length > 1) {
-          const secondarySort = sorting[1];
-          query = query.order(secondarySort.id, {
-            ascending: !secondarySort.desc,
-          });
+          let comparison = 0;
+          if (aValue != null && bValue != null) {
+            if (aValue < bValue) comparison = -1;
+            else if (aValue > bValue) comparison = 1;
+          } else if (aValue == null && bValue != null) comparison = 1;
+          else if (aValue != null && bValue == null) comparison = -1;
+
+          if (comparison !== 0) {
+            return sort.desc ? -comparison : comparison;
+          }
         }
-      }
-
-      // Apply pagination
-      const from = pagination.pageIndex * pagination.pageSize;
-      const to = from + pagination.pageSize - 1;
-      query = query.range(from, to);
-
-      const { data: expenses, error, count } = await query;
-
-      if (error) throw error;
-
-      setData(expenses || []);
-      setTotalCount(count || 0);
-      setPageCount(Math.ceil((count || 0) / pagination.pageSize));
-    } catch (error) {
-      console.error("Error fetching expenses:", error);
-      setData([]);
-      setTotalCount(0);
-      setPageCount(0);
-    } finally {
-      setIsLoading(false);
+        return 0;
+      });
     }
-  }, [pagination.pageIndex, pagination.pageSize, sorting]);
 
-  useEffect(() => {
-    fetchExpenses();
-  }, [fetchExpenses]);
+    return filtered;
+  }, [allData, sorting]);
+
+  // Calculate pagination
+  const totalCount = filteredAndSortedData.length;
+  const pageCount = Math.ceil(totalCount / pagination.pageSize);
+  const from = pagination.pageIndex * pagination.pageSize;
+  const to = from + pagination.pageSize;
+  const data = filteredAndSortedData.slice(from, to);
 
   const addExpense = async (newExpense: Omit<Expense, "id">) => {
     try {
@@ -91,8 +81,8 @@ export function useExpensesPaginated() {
 
       if (error) throw error;
 
-      // Refresh the current page
-      await fetchExpenses();
+      // Refresh the global data
+      await refreshExpenses();
 
       return expenseWithId;
     } catch (error) {
@@ -113,8 +103,8 @@ export function useExpensesPaginated() {
 
       if (error) throw error;
 
-      // Refresh the current page
-      await fetchExpenses();
+      // Refresh the global data
+      await refreshExpenses();
     } catch (error) {
       console.error("Error updating expense:", error);
       throw error;
@@ -127,8 +117,8 @@ export function useExpensesPaginated() {
 
       if (error) throw error;
 
-      // Refresh the current page
-      await fetchExpenses();
+      // Refresh the global data
+      await refreshExpenses();
     } catch (error) {
       console.error("Error deleting expense:", error);
       throw error;
@@ -139,7 +129,7 @@ export function useExpensesPaginated() {
     data,
     totalCount,
     pageCount,
-    isLoading,
+    isLoading: globalLoading,
     pagination,
     setPagination,
     sorting,
@@ -147,6 +137,6 @@ export function useExpensesPaginated() {
     addExpense,
     updateExpense,
     deleteExpense,
-    refetch: fetchExpenses,
+    refetch: refreshExpenses,
   };
 }
