@@ -123,54 +123,19 @@ export function PaymentsPage() {
     setShowDeleteModal(true);
   }, []);
 
-  const calculateBalanceCarryover = useCallback(
-    (driverId: string, amountPaid: number) => {
-      if (!driverId) return 0;
+  const handleDriverChange = useCallback((driverId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      driver_id: driverId,
+    }));
+  }, []);
 
-      const selectedDriver = drivers.find((driver) => driver.id === driverId);
-      if (!selectedDriver) return 0;
-
-      const tierAmount =
-        selectedDriver.tier === "A"
-          ? 760
-          : selectedDriver.tier === "B"
-          ? 800
-          : 0;
-      return tierAmount - amountPaid;
-    },
-    [drivers]
-  );
-
-  const handleDriverChange = useCallback(
-    (driverId: string) => {
-      const amountPaid = parseFloat(formData.amount_paid) || 0;
-      const balanceCarryover = calculateBalanceCarryover(driverId, amountPaid);
-
-      setFormData((prev) => ({
-        ...prev,
-        driver_id: driverId,
-        balance_carryover: balanceCarryover.toString(),
-      }));
-    },
-    [formData.amount_paid, calculateBalanceCarryover]
-  );
-
-  const handleAmountPaidChange = useCallback(
-    (amountPaidStr: string) => {
-      const amountPaid = parseFloat(amountPaidStr) || 0;
-      const balanceCarryover = calculateBalanceCarryover(
-        formData.driver_id,
-        amountPaid
-      );
-
-      setFormData((prev) => ({
-        ...prev,
-        amount_paid: amountPaidStr,
-        balance_carryover: balanceCarryover.toString(),
-      }));
-    },
-    [formData.driver_id, calculateBalanceCarryover]
-  );
+  const handleAmountPaidChange = useCallback((amountPaidStr: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      amount_paid: amountPaidStr,
+    }));
+  }, []);
 
   const columns: ColumnDef<DriverPayment>[] = useMemo(
     () => [
@@ -482,7 +447,13 @@ export function PaymentsPage() {
                 <input
                   type="number"
                   step="0.01"
-                  readOnly
+                  onChange={(e) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      balance_carryover: e.target.value,
+                    }));
+                  }}
+                  required
                   value={formData.balance_carryover}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-gray-600 text-gray-900 dark:text-white"
                 />
