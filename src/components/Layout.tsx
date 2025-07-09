@@ -152,7 +152,7 @@ export function Layout({ children, currentPage }: LayoutProps) {
           <button
             onClick={async () => {
               await logout();
-              navigate("/login");
+              window.location.reload(); // Reload to ensure state is reset
             }}
             className="w-full flex items-center px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
           >
