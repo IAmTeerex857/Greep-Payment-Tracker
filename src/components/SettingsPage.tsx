@@ -1,10 +1,4 @@
-import {
-  AlertTriangle,
-  Download,
-  FileText,
-  RefreshCw,
-  Upload,
-} from "lucide-react";
+import { AlertTriangle, Download, FileText, Upload } from "lucide-react";
 import React, { useState } from "react";
 import { useData } from "../hooks/useGlobalData";
 import { importFromCSV } from "../utils/importUtils";
@@ -222,24 +216,6 @@ export function SettingsPage() {
                 disabled={importing}
               />
             </label>
-          </div>
-
-          <div className="mt-4 flex items-center justify-between">
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">
-                Reset Data
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                Reset all data to initial state
-              </p>
-            </div>
-            <button
-              onClick={() => setShowConfirmReset(true)}
-              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2"
-            >
-              <RefreshCw className="w-4 h-4" />
-              Reset
-            </button>
           </div>
         </div>
 
